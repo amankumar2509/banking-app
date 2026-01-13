@@ -1,0 +1,7 @@
+package net.banking.banking_app.service;
+
+import net.banking.banking_app.dto.AccountDto;
+
+public interface AccountService {
+    AccountDto createAccount(AccountDto accountDto);
+}
