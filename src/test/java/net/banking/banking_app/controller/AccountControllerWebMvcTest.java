@@ -45,4 +45,5 @@ class AccountControllerWebMvcTest {
                 .andExpect(jsonPath("$.accountHolderName").value("abc"))
                 .andExpect(jsonPath("$.balance").value(1000));
     }
+
 }
