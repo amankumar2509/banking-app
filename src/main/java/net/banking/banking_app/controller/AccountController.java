@@ -66,7 +66,7 @@ public class AccountController {
     @PostMapping("/transfer")
     public ResponseEntity<String> transferFund(TransferFundDto transferFundDto){
         accountService.transferFunds(transferFundDto);
-        return ResponseEntity.ok("Transfer Successfull");
+        return ResponseEntity.ok("Transfer Successful");
 
     }
 }
