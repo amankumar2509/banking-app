@@ -1,6 +1,7 @@
 package net.banking.banking_app.service.impl;
 
 import net.banking.banking_app.dto.AccountDto;
+import net.banking.banking_app.dto.TransferFundDto;
 import net.banking.banking_app.entity.Account;
 import net.banking.banking_app.exception.AccountException;
 import net.banking.banking_app.mapper.AccountMapper;
@@ -68,6 +69,24 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository
                 .findById(id).orElseThrow(()-> new AccountException("Account does not exist"));
         accountRepository.deleteById(id);
+    }
+
+    @Override
+    public void transferFunds(TransferFundDto transferFundDto){
+        //retrive the account from which we need to send amount
+
+       Account fromAccount= accountRepository.findById(transferFundDto.fromAccountId()).orElseThrow(()->new AccountException("Account does not exits"));
+       Account toAccount= accountRepository.findById(transferFundDto.toAccountId()).orElseThrow(()->new AccountException("Account does not exist"));
+
+       //debit the amount from fromAccount object
+        fromAccount.setBalance(fromAccount.getBalance()- transferFundDto.amount());
+
+        //credit the amount to toAccount
+        toAccount.setBalance(toAccount.getBalance()+ transferFundDto.amount());
+
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+
     }
 
 

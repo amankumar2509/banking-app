@@ -1,6 +1,7 @@
 package net.banking.banking_app.service;
 
 import net.banking.banking_app.dto.AccountDto;
+import net.banking.banking_app.dto.TransferFundDto;
 
 import java.util.List;
 
@@ -11,4 +12,6 @@ public interface AccountService {
     AccountDto withdraw(Long id, double ammount);
     List<AccountDto> getAllAccounts();
     void deleteAccount(Long id);
+    void transferFunds(TransferFundDto transferFundDto);
+
 }
