@@ -1,5 +1,6 @@
 package net.banking.banking_app.service.impl;
 
+import jakarta.transaction.Transactional;
 import net.banking.banking_app.dto.AccountDto;
 import net.banking.banking_app.dto.TransferFundDto;
 import net.banking.banking_app.entity.Account;
@@ -72,13 +73,28 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public void transferFunds(TransferFundDto transferFundDto){
+        if (transferFundDto.amount() <= 0) {
+            throw new AccountException("Transfer amount must be greater than zero");
+        }
+
+        if (transferFundDto.fromAccountId()
+                .equals(transferFundDto.toAccountId())) {
+            throw new AccountException("Cannot transfer to same account");
+        }
+
+
         //retrive the account from which we need to send amount
 
-       Account fromAccount= accountRepository.findById(transferFundDto.fromAccountId()).orElseThrow(()->new AccountException("Account does not exits"));
-       Account toAccount= accountRepository.findById(transferFundDto.toAccountId()).orElseThrow(()->new AccountException("Account does not exist"));
+       Account fromAccount= accountRepository.findById(transferFundDto.fromAccountId()).orElseThrow(()->new AccountException(" Sender account not found"));
+       Account toAccount= accountRepository.findById(transferFundDto.toAccountId()).orElseThrow(()->new AccountException("Receiver account  not found"));
 
-       //debit the amount from fromAccount object
+        if (fromAccount.getBalance() < transferFundDto.amount()) {
+            throw new AccountException("Insufficient balance");
+        }
+
+        //debit the amount from fromAccount object
         fromAccount.setBalance(fromAccount.getBalance()- transferFundDto.amount());
 
         //credit the amount to toAccount
