@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(total);
         Account savedAccount=accountRepository.save(account);
         Transaction transaction=new Transaction();
-        transaction.setId(id);
+        transaction.setAccountId(id);
         transaction.setAmount(amount);
         transaction.setTransactionType(TRANSACTION_TYPE_WITHDRAW);
         transaction.setTimestamp(LocalDateTime.now());
