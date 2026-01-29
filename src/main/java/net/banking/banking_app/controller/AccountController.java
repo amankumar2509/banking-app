@@ -72,7 +72,7 @@ public class AccountController {
     }
 
     //transaction REST API
-    @GetMapping("/{id/transactions}")
+    @GetMapping("/{id}/transactions}")
     public  ResponseEntity<List<TransactionDTO>> fetchAccountTransactions(@PathVariable("id") Long accountId){
         List<TransactionDTO>transactions= accountService.getAccountTransactions(accountId);
         return ResponseEntity.ok(transactions);
