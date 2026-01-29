@@ -4,12 +4,15 @@ import jakarta.transaction.Transactional;
 import net.banking.banking_app.dto.AccountDto;
 import net.banking.banking_app.dto.TransferFundDto;
 import net.banking.banking_app.entity.Account;
+import net.banking.banking_app.entity.Transaction;
 import net.banking.banking_app.exception.AccountException;
 import net.banking.banking_app.mapper.AccountMapper;
 import net.banking.banking_app.repository.AccountRepository;
+import net.banking.banking_app.repository.TransactionRepository;
 import net.banking.banking_app.service.AccountService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +20,13 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService {
 
     private AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
+    private static final String TRANSACTION_TYPE_DEPOSIT=   "DEPOSIT";
+    private static final String TRANSACTION_TYPE_WITHDRAW=   "WITHDRAW";
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository,TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository=transactionRepository;
     }
 
     @Override
@@ -36,6 +43,8 @@ public class AccountServiceImpl implements AccountService {
         return AccountMapper.mapToAccountDto(account);
     }
 
+
+    //Deposit method
     @Override
     public AccountDto deposit(Long id, double amount) {
         Account account = accountRepository.findById(id).orElseThrow(()-> new AccountException("Account does not exist"));
@@ -43,9 +52,21 @@ public class AccountServiceImpl implements AccountService {
        double total = account.getBalance() + amount;
        account.setBalance(total);
        Account savedAccount = accountRepository.save(account);
-       return AccountMapper.mapToAccountDto(savedAccount);
+
+    //transaction related records
+        Transaction transaction= new Transaction();
+        transaction.setAccountId(id);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TRANSACTION_TYPE_DEPOSIT);
+        transaction.setTimestamp(LocalDateTime.now());
+        transactionRepository.save(transaction);
+
+        return AccountMapper.mapToAccountDto(savedAccount);
+
     }
 
+
+    //Withdraw
     public  AccountDto withdraw(Long id, double amount){
         Account account= accountRepository.findById(id).orElseThrow(()-> new AccountException("Account does not exist"));
         if(account.getBalance()<amount){
@@ -54,6 +75,12 @@ public class AccountServiceImpl implements AccountService {
         double total= account.getBalance()-amount;
         account.setBalance(total);
         Account savedAccount=accountRepository.save(account);
+        Transaction transaction=new Transaction();
+        transaction.setId(id);
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TRANSACTION_TYPE_WITHDRAW);
+        transaction.setTimestamp(LocalDateTime.now());
+        transactionRepository.save(transaction);
         return AccountMapper.mapToAccountDto(savedAccount);
     }
 
