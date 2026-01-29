@@ -2,6 +2,7 @@ package net.banking.banking_app.service.impl;
 
 import jakarta.transaction.Transactional;
 import net.banking.banking_app.dto.AccountDto;
+import net.banking.banking_app.dto.TransactionDTO;
 import net.banking.banking_app.dto.TransferFundDto;
 import net.banking.banking_app.entity.Account;
 import net.banking.banking_app.entity.Transaction;
@@ -140,6 +141,20 @@ public class AccountServiceImpl implements AccountService {
 
         transactionRepository.save(transaction);
 
+    }
+
+    @Override
+    public List<TransactionDTO> getAccountTransactions(Long accountId) {
+
+        List<Transaction>transactions=transactionRepository.findByAccountIdOrderByTimestampDesc(accountId);
+        return transactions.stream()
+                .map(transaction -> convertEntityToDTO(transaction))
+                .collect(Collectors.toList());
+
+    }
+
+    private  TransactionDTO convertEntityToDTO(Transaction transaction){
+        return new TransactionDTO(transaction.getId(), transaction.getAccountId(), transaction.getAmount(), transaction.getTransactionType(), transaction.getTimestamp());
     }
 
 
