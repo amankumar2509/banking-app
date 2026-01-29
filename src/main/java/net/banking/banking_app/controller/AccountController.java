@@ -1,6 +1,7 @@
 package net.banking.banking_app.controller;
 
 import net.banking.banking_app.dto.AccountDto;
+import net.banking.banking_app.dto.TransactionDTO;
 import net.banking.banking_app.dto.TransferFundDto;
 import net.banking.banking_app.service.AccountService;
 import org.springframework.http.HttpStatus;
@@ -62,11 +63,19 @@ public class AccountController {
         return ResponseEntity.ok("Account is deleted successfully!");
     }
 
-    //Transfer API
+    //Transfer  REST API
     @PostMapping("/transfer")
     public ResponseEntity<String> transferFund( @RequestBody TransferFundDto transferFundDto){
         accountService.transferFunds(transferFundDto);
         return ResponseEntity.ok("Transfer Successful");
+
+    }
+
+    //transaction REST API
+    @GetMapping("/{id/transactions}")
+    public  ResponseEntity<List<TransactionDTO>> fetchAccountTransactions(@PathVariable("id") Long accountId){
+        List<TransactionDTO>transactions= accountService.getAccountTransactions(accountId);
+        return ResponseEntity.ok(transactions);
 
     }
 }
