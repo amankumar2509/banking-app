@@ -24,5 +24,6 @@ public class Transaction {
     private  double amount;
     private  String transactionType;
     private LocalDateTime timestamp;
+    private  String referenceNo;
 
 }

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.banking.banking_app.client.ReferenceFeignClient;
+
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -26,10 +28,14 @@ public class AccountServiceImpl implements AccountService {
     private static final String TRANSACTION_TYPE_WITHDRAW=   "WITHDRAW";
     private static final String TRANSACTION_TYPE_TRANSFER=   "TRANSFER";
 
+    private final ReferenceFeignClient referenceFeignClient;
 
-    public AccountServiceImpl(AccountRepository accountRepository,TransactionRepository transactionRepository) {
+
+
+    public AccountServiceImpl(AccountRepository accountRepository,TransactionRepository transactionRepository,ReferenceFeignClient referenceFeignClient) {
         this.accountRepository = accountRepository;
         this.transactionRepository=transactionRepository;
+        this.referenceFeignClient=referenceFeignClient;
     }
 
     @Override
@@ -62,8 +68,13 @@ public class AccountServiceImpl implements AccountService {
         transaction.setAmount(amount);
         transaction.setTransactionType(TRANSACTION_TYPE_DEPOSIT);
         transaction.setTimestamp(LocalDateTime.now());
-        transactionRepository.save(transaction);
 
+        //feign client reference service
+        String referenceNo = referenceFeignClient.generateReference();
+        //System.out.println("🔥 Reference generated: " + referenceNo);
+        transaction.setReferenceNo(referenceNo);
+
+        transactionRepository.save(transaction);
         return AccountMapper.mapToAccountDto(savedAccount);
 
     }
@@ -85,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
         transaction.setTimestamp(LocalDateTime.now());
         transactionRepository.save(transaction);
         return AccountMapper.mapToAccountDto(savedAccount);
+
     }
 
     @Override
@@ -154,7 +166,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private  TransactionDTO convertEntityToDTO(Transaction transaction){
-        return new TransactionDTO(transaction.getId(), transaction.getAccountId(), transaction.getAmount(), transaction.getTransactionType(), transaction.getTimestamp());
+        return new TransactionDTO(transaction.getId(), transaction.getAccountId(), transaction.getAmount(), transaction.getTransactionType(), transaction.getTimestamp(), transaction.getReferenceNo());
     }
 
 

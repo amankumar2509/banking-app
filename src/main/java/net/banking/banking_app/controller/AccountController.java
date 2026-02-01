@@ -78,4 +78,9 @@ public class AccountController {
         return ResponseEntity.ok(transactions);
 
     }
+
+    //mini statement
+//    public ResponseEntity<List<TransactionDTO>>getMiniStatement(@PathVariable accountId){
+//        List<TransactionDTO>transactions=transaction
+//    }
 }
